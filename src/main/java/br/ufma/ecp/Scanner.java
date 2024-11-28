@@ -160,14 +160,14 @@ public class Scanner {
         return new Token(NUMBER, num);
     }
 
-    private Token string() {
+    private Token string () {
         advance();
         start = current;
         while (peek() != '"' && peek() != 0) {
             advance();
         }
-        String s = new String(input, start, current - start, StandardCharsets.UTF_8);
-        Token token = new Token(TokenType.STRING, s);
+        String s = new String(input, start, current-start, StandardCharsets.UTF_8);
+        Token token = new Token (TokenType.STRING,s);
         advance();
         return token;
     }
@@ -195,6 +195,7 @@ public class Scanner {
             return (char) input[current];
         return 0;
     }
+
 
 
 }
