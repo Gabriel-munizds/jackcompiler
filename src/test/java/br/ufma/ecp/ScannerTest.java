@@ -17,7 +17,7 @@ public class ScannerTest extends TestSupport {
 
     @Test
     public void testSimple () {
-        String input = "45  + if + \"ola mundo\" - 876";
+        String input = "45 variavel + while < , if";
         Scanner scan = new Scanner (input.getBytes());
         for (Token tk = scan.nextToken(); tk.type != TokenType.EOF; tk = scan.nextToken()) {
             System.out.println(tk);

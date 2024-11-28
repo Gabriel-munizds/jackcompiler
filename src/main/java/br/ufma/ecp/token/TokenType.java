@@ -4,26 +4,27 @@ import java.util.List;
 import java.util.Map;
 
 public enum TokenType {
-    PLUS,MINUS,
 
-     // Literals.
-     NUMBER,
-     STRING,
+    // Literals.
+    NUMBER,
+    IDENT,
+    STRING,
 
+    // keywords
+    WHILE, CLASS,CONSTRUCTOR,FUNCTION,
+    METHOD,FIELD,STATIC,VAR,INT,
+    CHAR,BOOLEAN,VOID,TRUE,FALSE,
+    NULL,THIS,LET,DO,IF,ELSE, RETURN,
+    EOF, ILLEGAL,
 
-     IDENT,
-
- 
-     // keywords
-     METHOD,
-     WHILE,
-     IF,
-     CLASS,
-     CONSTRUCTOR,
-
-     EOF,
-
-     ILLEGAL;
+    // symbols
+    LPAREN,RPAREN,
+    LBRACE, RBRACE,
+    LBRACKET,RBRACKET,
+    COMMA, SEMICOLON, DOT,
+    PLUS,  MINUS,ASTERISK, SLASH,
+    AND, OR, NOT,
+    LT, GT, EQ;
 
      static public boolean isSymbol (char c) {
         String symbols = "{}()[].,;+-*/&|<>=~";
