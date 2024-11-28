@@ -26,9 +26,9 @@ public enum TokenType {
     AND, OR, NOT,
     LT, GT, EQ;
 
-     static public boolean isSymbol (char c) {
+     static public boolean isSymbol (String c) {
         String symbols = "{}()[].,;+-*/&|<>=~";
-        return symbols.indexOf(c) > -1;
+        return symbols.contains(c);
     }
 
 
