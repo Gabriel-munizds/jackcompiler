@@ -142,6 +142,17 @@ public class Parser {
         printNonTerminal("/letStatement");
     }
 
+    void parseSubroutineCall() {
+        expectPeek(IDENT);
+        expectPeek(LPAREN);
+        expectPeek(RPAREN);
+    }
 
-
+    public void parseDo() {
+        printNonTerminal("doStatement");
+        expectPeek(DO);
+        parseSubroutineCall();
+        expectPeek(SEMICOLON);
+        printNonTerminal("/doStatement");
+    }
 }
