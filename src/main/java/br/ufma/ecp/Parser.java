@@ -3,6 +3,8 @@ package br.ufma.ecp;
 import br.ufma.ecp.token.Token;
 import br.ufma.ecp.token.TokenType;
 
+import static br.ufma.ecp.token.TokenType.*;
+
 public class Parser {
 
     private static class ParseError extends RuntimeException {}
@@ -101,7 +103,7 @@ public class Parser {
                 expectPeek(TokenType.THIS);
                 break;
             case IDENT:
-                expectPeek(TokenType.IDENT);
+                expectPeek(IDENT);
                 break;
             default:
                 throw error(peekToken, "term expected");
@@ -121,6 +123,23 @@ public class Parser {
             parseTerm();
         }
         printNonTerminal("/expression");
+    }
+
+    void parseLet() {
+        printNonTerminal("letStatement");
+        expectPeek(LET);
+        expectPeek(IDENT);
+
+        if (peekTokenIs(LBRACKET)) {
+            expectPeek(LBRACKET);
+            parseExpression();
+            expectPeek(RBRACKET);
+        }
+
+        expectPeek(EQ);
+        parseExpression();
+        expectPeek(SEMICOLON);
+        printNonTerminal("/letStatement");
     }
 
 
