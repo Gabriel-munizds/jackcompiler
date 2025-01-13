@@ -6,6 +6,7 @@ import br.ufma.ecp.token.TokenType;
 import static br.ufma.ecp.token.TokenType.*;
 
 public class Parser {
+    private VMWriter vmWriter = new VMWriter();
 
     private static class ParseError extends RuntimeException {}
 
@@ -88,9 +89,6 @@ public class Parser {
     void parseTerm() {
         printNonTerminal("term");
         switch (peekToken.type) {
-            case NUMBER:
-                expectPeek(TokenType.NUMBER);
-                break;
             case STRING:
                 expectPeek(TokenType.STRING);
                 break;
@@ -104,6 +102,10 @@ public class Parser {
                 break;
             case IDENT:
                 expectPeek(IDENT);
+                break;
+            case NUMBER:
+                expectPeek(TokenType.NUMBER);
+                vmWriter.writePush(VMWriter.Segment.CONST, Integer.parseInt(currentToken.lexeme));
                 break;
             default:
                 throw error(peekToken, "term expected");
@@ -154,5 +156,9 @@ public class Parser {
         parseSubroutineCall();
         expectPeek(SEMICOLON);
         printNonTerminal("/doStatement");
+    }
+
+    public String VMOutput() {
+        return vmWriter.vmOutput();
     }
 }
