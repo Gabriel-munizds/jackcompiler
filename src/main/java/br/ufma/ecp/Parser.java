@@ -121,10 +121,41 @@ public class Parser {
         printNonTerminal("expression");
         parseTerm ();
         while (isOperator(peekToken.lexeme)) {
-            expectPeek(peekToken.type);
+            var ope = peekToken.type;
+            expectPeek(ope);
             parseTerm();
+            compileOperators(ope);
         }
         printNonTerminal("/expression");
+    }
+
+    public void compileOperators(TokenType type) {
+
+        if (type == ASTERISK) {
+            vmWriter.writeCall("Math.multiply", 2);
+        } else if (type == SLASH) {
+            vmWriter.writeCall("Math.divide", 2);
+        } else {
+            vmWriter.writeArithmetic(typeOperator(type));
+        }
+    }
+
+    private VMWriter.Command typeOperator(TokenType type) {
+        if (type == PLUS)
+            return VMWriter.Command.ADD;
+        if (type == MINUS)
+            return VMWriter.Command.SUB;
+        if (type == LT)
+            return VMWriter.Command.LT;
+        if (type == GT)
+            return VMWriter.Command.GT;
+        if (type == EQ)
+            return VMWriter.Command.EQ;
+        if (type == AND)
+            return VMWriter.Command.AND;
+        if (type == OR)
+            return VMWriter.Command.OR;
+        return null;
     }
 
     void parseLet() {
