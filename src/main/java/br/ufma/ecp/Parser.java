@@ -99,20 +99,24 @@ public class Parser {
                     vmWriter.writeCall("String.appendChar", 2);
                 }
                 break;
-            case FALSE:
-            case NULL:
-            case TRUE:
-                expectPeek(TokenType.FALSE, TokenType.NULL, TokenType.TRUE);
-                break;
-            case THIS:
-                expectPeek(TokenType.THIS);
-                break;
             case IDENT:
                 expectPeek(IDENT);
                 break;
             case NUMBER:
                 expectPeek(TokenType.NUMBER);
                 vmWriter.writePush(VMWriter.Segment.CONST, Integer.parseInt(currentToken.lexeme));
+                break;
+            case FALSE:
+            case NULL:
+            case TRUE:
+                expectPeek(FALSE, NULL, TRUE);
+                vmWriter.writePush(VMWriter.Segment.CONST, 0);
+                if (currentToken.type == TRUE)
+                    vmWriter.writeArithmetic(VMWriter.Command.NOT);
+                break;
+            case THIS:
+                expectPeek(THIS);
+                vmWriter.writePush(VMWriter.Segment.POINTER, 0);
                 break;
             default:
                 throw error(peekToken, "term expected");
