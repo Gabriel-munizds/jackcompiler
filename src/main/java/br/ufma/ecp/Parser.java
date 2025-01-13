@@ -118,6 +118,17 @@ public class Parser {
                 expectPeek(THIS);
                 vmWriter.writePush(VMWriter.Segment.POINTER, 0);
                 break;
+            case MINUS:
+            case NOT:
+                expectPeek(MINUS, NOT);
+                var op = currentToken.type;
+                parseTerm();
+                if (op == MINUS)
+                    vmWriter.writeArithmetic(VMWriter.Command.NEG);
+                else
+                    vmWriter.writeArithmetic(VMWriter.Command.NOT);
+
+                break;
             default:
                 throw error(peekToken, "term expected");
         }
