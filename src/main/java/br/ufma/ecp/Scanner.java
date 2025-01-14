@@ -168,7 +168,7 @@ public class Scanner {
         }
 
         String num = new String(input, start, current - start, StandardCharsets.UTF_8);
-        return new Token(NUMBER, num, line);
+        return new Token(INTEGER, num, line);
     }
 
     private Token string() {
@@ -248,7 +248,7 @@ public class Scanner {
             return 0;
         }
     }
-    
+
 
 
 }

@@ -42,7 +42,9 @@ public class Token {
         }
         return "<" + categoria + "> " + valor  + " </" + categoria + ">";
 
-
+    }
+    public String value () {
+        return type.value;
     }
 
     
