@@ -423,6 +423,33 @@ public class Parser {
 
         printNonTerminal("/parameterList");
     }
+    void parseClassVarDec() {
+        printNonTerminal("classVarDec");
+        expectPeek(FIELD, STATIC);
+
+        SymbolTable.Kind kind = SymbolTable.Kind.STATIC;
+        if (currentTokenIs(FIELD))
+            kind = SymbolTable.Kind.FIELD;
+
+        // 'int' | 'char' | 'boolean' | className
+        expectPeek(INT, CHAR, BOOLEAN, IDENT);
+        String type = currentToken.lexeme;
+
+        expectPeek(IDENT);
+        String name = currentToken.lexeme;
+
+        symbolTable.define(name, type, kind);
+        while (peekTokenIs(COMMA)) {
+            expectPeek(COMMA);
+            expectPeek(IDENT);
+
+            name = currentToken.lexeme;
+            symbolTable.define(name, type, kind);
+        }
+
+        expectPeek(SEMICOLON);
+        printNonTerminal("/classVarDec");
+    }
     void parseVarDec() {
         printNonTerminal("varDec");
         expectPeek(VAR);
@@ -431,17 +458,17 @@ public class Parser {
 
         // 'int' | 'char' | 'boolean' | className
         expectPeek(INT, CHAR, BOOLEAN, IDENT);
-        String type = currentToken.value();
+        String type = currentToken.lexeme;
 
         expectPeek(IDENT);
-        String name = currentToken.value();
+        String name = currentToken.lexeme;
         symbolTable.define(name, type, kind);
 
         while (peekTokenIs(COMMA)) {
             expectPeek(COMMA);
             expectPeek(IDENT);
 
-            name = currentToken.value();
+            name = currentToken.lexeme;
             symbolTable.define(name, type, kind);
 
         }
