@@ -12,7 +12,7 @@ public class Parser {
     private static class ParseError extends RuntimeException {}
     private int ifLabelNum;
     private int whileLabelNum;
-    private String className;
+    private String className = "";
 
 
     private Scanner scan;
@@ -357,7 +357,7 @@ public class Parser {
         expectPeek(VOID, INT, CHAR, BOOLEAN, IDENT);
         expectPeek(IDENT);
 
-        var functionName = className + "." + currentToken.value();
+        var functionName = className + "." + currentToken.lexeme;
 
         expectPeek(LPAREN);
         parseParameterList();
@@ -377,17 +377,6 @@ public class Parser {
         var nlocals = symbolTable.varCount(SymbolTable.Kind.VAR);
 
         vmWriter.writeFunction(functionName, nlocals);
-
-        if (subroutineType == CONSTRUCTOR) {
-            vmWriter.writePush(VMWriter.Segment.CONST, symbolTable.varCount(SymbolTable.Kind.FIELD));
-            vmWriter.writeCall("Memory.alloc", 1);
-            vmWriter.writePop(VMWriter.Segment.POINTER, 0);
-        }
-
-        if (subroutineType == METHOD) {
-            vmWriter.writePush(VMWriter.Segment.ARG, 0);
-            vmWriter.writePop(VMWriter.Segment.POINTER, 0);
-        }
 
         parseStatements();
         expectPeek(RBRACE);
@@ -475,6 +464,25 @@ public class Parser {
 
         expectPeek(SEMICOLON);
         printNonTerminal("/varDec");
+    }
+    void parseClass() {
+        printNonTerminal("class");
+        expectPeek(CLASS);
+        expectPeek(IDENT);
+        className = currentToken.value();
+        expectPeek(LBRACE);
+
+        while (peekTokenIs(STATIC) || peekTokenIs(FIELD)) {
+            parseClassVarDec();
+        }
+
+        while (peekTokenIs(FUNCTION) || peekTokenIs(CONSTRUCTOR) || peekTokenIs(METHOD)) {
+            parseSubroutineDec();
+        }
+
+        expectPeek(RBRACE);
+
+        printNonTerminal("/class");
     }
 
 
