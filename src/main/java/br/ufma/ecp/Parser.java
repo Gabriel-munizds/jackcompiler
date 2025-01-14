@@ -9,6 +9,8 @@ public class Parser {
     private VMWriter vmWriter = new VMWriter();
 
     private static class ParseError extends RuntimeException {}
+    private int ifLabelNum;
+    private int whileLabelNum;
 
     private Scanner scan;
     private Token currentToken;
@@ -29,6 +31,8 @@ public class Parser {
     public void parse () {
 
     }
+
+
 
     // funções auxiliares
     public String XMLOutput() {
@@ -214,4 +218,126 @@ public class Parser {
     public String VMOutput() {
         return vmWriter.vmOutput();
     }
+
+    void parseReturn() {
+        printNonTerminal("returnStatement");
+        expectPeek(RETURN);
+        if (!peekTokenIs(SEMICOLON)) {
+            parseExpression();
+        } else {
+            vmWriter.writePush(VMWriter.Segment.CONST, 0);
+        }
+        expectPeek(SEMICOLON);
+        vmWriter.writeReturn();
+
+        printNonTerminal("/returnStatement");
+    }
+
+    void parseStatements() {
+        printNonTerminal("statements");
+        while (peekToken.type == WHILE ||
+                peekToken.type == IF ||
+                peekToken.type == LET ||
+                peekToken.type == DO ||
+                peekToken.type == RETURN) {
+            parseStatement();
+        }
+
+        printNonTerminal("/statements");
+    }
+
+    void parseStatement() {
+        switch (peekToken.type) {
+            case LET:
+                parseLet();
+                break;
+            case WHILE:
+                parseWhile();
+                break;
+            case IF:
+                parseIf();
+                break;
+            case RETURN:
+                parseReturn();
+                break;
+            case DO:
+                parseDo();
+                break;
+            default:
+                throw error(peekToken, "Expected a statement");
+        }
+    }
+
+    void parseWhile() {
+        printNonTerminal("whileStatement");
+
+        var labelTrue = "WHILE_EXP" + whileLabelNum;
+        var labelFalse = "WHILE_END" + whileLabelNum;
+        whileLabelNum++;
+
+        vmWriter.writeLabel(labelTrue);
+
+        expectPeek(WHILE);
+        expectPeek(LPAREN);
+        parseExpression();
+
+        vmWriter.writeArithmetic(VMWriter.Command.NOT);
+        vmWriter.writeIf(labelFalse);
+
+        expectPeek(RPAREN);
+        expectPeek(LBRACE);
+        parseStatements();
+
+        vmWriter.writeGoto(labelTrue); // Go back to labelTrue and check condition
+        vmWriter.writeLabel(labelFalse); // Breaks out of while loop because ~(condition) is true
+
+        expectPeek(RBRACE);
+        printNonTerminal("/whileStatement");
+    }
+
+    void parseIf() {
+        printNonTerminal("ifStatement");
+
+        var labelTrue = "IF_TRUE" + ifLabelNum;
+        var labelFalse = "IF_FALSE" + ifLabelNum;
+        var labelEnd = "IF_END" + ifLabelNum;
+
+        ifLabelNum++;
+
+        expectPeek(IF);
+        expectPeek(LPAREN);
+        parseExpression();
+        expectPeek(RPAREN);
+
+        vmWriter.writeIf(labelTrue);
+        vmWriter.writeGoto(labelFalse);
+        vmWriter.writeLabel(labelTrue);
+
+        expectPeek(LBRACE);
+        parseStatements();
+        expectPeek(RBRACE);
+
+
+        if (peekTokenIs(ELSE))
+        {
+            vmWriter.writeGoto(labelEnd);
+        }
+
+        vmWriter.writeLabel(labelFalse);
+
+        if (peekTokenIs(ELSE))
+        {
+            expectPeek(ELSE);
+
+            expectPeek(LBRACE);
+
+            parseStatements();
+
+            expectPeek(RBRACE);
+            vmWriter.writeLabel(labelEnd);
+        }
+
+        printNonTerminal("/ifStatement");
+    }
+
 }
