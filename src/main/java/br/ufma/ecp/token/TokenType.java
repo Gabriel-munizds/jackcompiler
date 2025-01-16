@@ -11,7 +11,6 @@ public enum TokenType {
     INTEGER(),
 
     IDENT(),
-    ILLEGAL,
 
     // keywords
     WHILE("while"), CLASS("class"),CONSTRUCTOR("constructor"),FUNCTION("function"),
@@ -66,7 +65,7 @@ public enum TokenType {
     }
 
 
-    static public boolean isSymbol (String c) {
+    static public boolean isSymbol (char c) {
         String symbols = "{}()[].,;+-*/&|<>=~";
         return symbols.indexOf(c) > -1;
     }
