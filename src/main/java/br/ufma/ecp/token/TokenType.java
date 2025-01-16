@@ -71,7 +71,7 @@ public enum TokenType {
     }
 
     static public boolean isOperator(TokenType type) {
-        return "+-*/<>=~&|".contains(type.value);
+        return type.value != null && "+-*/<>=~&|".contains(type.value);
     }
 
     static public TokenType keyword (String value) {
